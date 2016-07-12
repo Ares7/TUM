@@ -4,9 +4,6 @@
 #include <limits.h>
 #include <cstring>
 
-#include <stdlib.h>
-
-#include <algorithm>
 #include <map>
 using namespace std;
 
@@ -86,12 +83,14 @@ int main()
     string in_seq;
     getline(cin, in_seq);
 
-    Graph test_graph(in_seq.length()); // n + 1 to avoid SEGFAULT
+    int gr_size = (int)in_seq.length()/6 + 2; // one extra space for the corner case
+    Graph test_graph(gr_size); // and one more (n + 1) to avoid SEGFAULT
 
     int i = 0;
     int k = 0;
     while (i < in_seq.length())
     {
+        //cout << "i= " << i;
         string tnum, elem;
         char type;
         type = in_seq[i];
@@ -103,15 +102,13 @@ int main()
         std::pair<std::map<string, string>::iterator, bool> ret;
         ret = mymap.insert(std::pair<string, string>(type + elem, obj_param));
 
-
-        int from_node = ret.first->second[1] - '0';
         int to_node = stoi(tnum);
 
-        // std::cout << " 22 with a value of " << ret.first->second[1] << '\n';//1-1, 0 -w
+        int from_node = ret.first->second[1] - '0';
 
-        if (ret.second == false && type == 'w')
-        {
-            // cout << "adding: " << from_node << to_node ;
+        if (ret.second == false && type == 'w' && from_node != to_node)
+        {   
+             //cout << "adding: " << from_node << to_node ;
 
             test_graph.addEdge(from_node, to_node);
         }
@@ -119,36 +116,37 @@ int main()
         string search_key = "r" + elem;
 
         map<string, string>::iterator ptr = mymap.find(search_key);
-        string b3;
-        if (ptr != mymap.end())
+        int b3;
+        if (ptr != mymap.end() && type == 'w' )
         {
             // element found;
-            b3 = ptr->second;
-            // cout <<  "b3:" << b3;
-            test_graph.addEdge(from_node, to_node);
+            b3 = ptr->second[1] - '0';
+             //cout <<  "b3:" << b3;
+             //cout <<  " b3 from, to: " << b3<< ' '<< to_node << '\n';
+            test_graph.addEdge(b3, to_node);
         }
 
         search_key = "w" + elem;
         ptr = mymap.find(search_key);
-        if (ptr != mymap.end())
+       
+        if (ptr != mymap.end() && type == 'r' )
         {
             // element found;
-            b3 = ptr->second;
-            // cout <<  "b3:" << b3;
-            test_graph.addEdge(from_node, to_node);
+            b3 = ptr->second[1] - '0';
+             //cout <<  "b4:" << b3;
+             //cout <<  " b4 from, to: " << b3<< ' '<< to_node << '\n';
+            test_graph.addEdge(b3, to_node);
         }
 
 
         i = i + 6;
     }
- /*
+/*
  std::cout << "\nmymap contains:\n";
   for (it=mymap.begin(); it!=mymap.end(); ++it)
     std::cout << it->first << " => " << it->second << '\n';
 */
 
-
-    // Create a graph
 
     if (test_graph.isCyclic())
         cout << "False" << '\n';
